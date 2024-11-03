@@ -2,6 +2,7 @@ import socket
 import struct
 import binascii
 import random
+import sys
 class DQuery:
   def __init__(self,domain) -> None:
     self.domain=domain
@@ -87,8 +88,21 @@ class DQuery:
       domain_ip+=str(data[12+sizeOfQsec+sizeOfAns+i])+"."
     #droping the "." at the end
     domain_ip=domain_ip[:-1]
-    print(domain_ip)
+    
     return domain_ip
+
+def make_request():
+  site=str(sys.argv[1])
+  query=DQuery(site)
+  query.form_packet()
+  query.connect_server()
+  ip=query.decode_response()
+  print(ip)
+
+
+
+if __name__=="__main__":
+  make_request()
 
 
 
