@@ -69,11 +69,12 @@ class DQuery:
     pointer=data[12]
     ini=12
     #counter stores the size of each token of the domain in the quesiton section
+    counter=0
     #we are doing this to find where in the response packet we should refernce, to get the resourceData(ip)
     while pointer!=0:
       counter+=pointer
       ini+=counter
-      pointer=data[ini]
+      pointer=data[ini+1]
       
     
     #the first +1 accounts for the 0 byte at the end of the qsec, then the two +2s account for the Qtype and Qclass 2 bytes each respectively
