@@ -82,7 +82,7 @@ class DQuery:
     # the additions account for bytes occupied by the pointer, the record type,the class, the TTL, and the resource Data length respectively
     sizeOfAns= 2+2+2+4+2
 
-    #itterate over each byte in the 4 byte IPv4 address,
+    #itterate over each byte in the 4 byte IPv4 address, each byte correspnds to the each of the four values in an ip address
     for i in range(4):
       domain_ip+=str(data[12+sizeOfQsec+sizeOfAns+i])+"."
     #droping the "." at the end
