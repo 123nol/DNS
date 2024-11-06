@@ -56,7 +56,7 @@ class DQuery:
     if self.request_packet:
       clientSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
       clientSocket.connect(self.host_addr)
-      clientSocket.send(self.request_packet)
+      clientSocket.sendto(self.request_packet,self.host_addr)
       self.response_packet=clientSocket.recv(1024)
       clientSocket.close()
   
