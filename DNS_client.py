@@ -3,12 +3,13 @@ import struct
 import binascii
 import random
 import sys
+import asyncio
 class DQuery:
   def __init__(self,domain) -> None:
     self.domain=domain
     #here the gethostname returns the ip of whereever the program is running from and since the server is also running from the computer the serverIP is the same 
     #as the ip we get here form gethostname, since both the client and server are running from the computer
-    self.host_addr=(str(socket.gethostname),54)
+    self.host_addr=(str(socket.gethostname),444)
     self.request_packet=b''
     self.response_packet=b'' 
   def form_packet(self):
@@ -54,9 +55,11 @@ class DQuery:
   
   def connect_server(self):
     if self.request_packet:
-      clientSocket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+      #because we started using an asyncio server on the server side which uses tcp protocol, we have to make our client socket also use tcp
+      clientSocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
       # clientSocket.connect(self.host_addr)
-      clientSocket.sendto(self.request_packet,self.host_addr)
+      clientSocket.connect(self.host_addr)
+      clientSocket.sendall(self.request_packet)
       self.response_packet=clientSocket.recv(1024)
       clientSocket.close()
   

@@ -1,6 +1,7 @@
 import socket
 import struct
 import binascii
+import asyncio
 
 
 dictionary={
@@ -80,30 +81,62 @@ class DNS_query:
     return packet
 
 
-def start_server(port=54):
-  server_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+# def start_server(port=54):
+#   server_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
   
-  host=socket.gethostname()
+#   host=socket.gethostname()
    
 
 
 
 
-  server_socket.bind((host,port))
-  server_socket.listen(1)
+#   server_socket.bind((host,port))
+#   server_socket.listen(1)
+#   try:
+#     while True:
+      
+#       #i can make the next five lines of code into a function, which are gonna be called for every client we pass (data,sender) to the funcition and it does the rest
+#       #that way we can put that fucniton into a asyncio.create_task(fetch_response_function()) method of and for every new user that connects we create anothor 
+#       # asyncio.create_task(fetch_respnse_function()) so the response funcion runs concurrently for all connected clients. i think currently it creates separate thread 
+#       #for each invidual connected user.
+#       data,sender=server_socket.recvfrom(1024)
+
+#       query=DNS_query(data=data)
+#       query.ext_dmn()
+#       response=query.response()
+#       server_socket.sendto(response,sender)
+#   except KeyboardInterrupt:
+#     print("closing server")
+#     server_socket.close
+
+async def handler(reader=asyncio.StreamReader,writer=asyncio.StreamWriter):
   try:
-    while True:
-      data,sender=server_socket.recvfrom(1024)
-      query=DNS_query(data=data)
-      query.ext_dmn()
-      response=query.response()
-      server_socket.sendto(response,sender)
-  except KeyboardInterrupt:
-    print("closing server")
-    server_socket.close
+    
+    data=await reader.read(1024)
+    query=DNS_query(data=data)
+    query.ext_dmn()
+    response=query.response()
+    if response:
+      await writer.write(response)
+      await writer.drain
+  
+  except Exception as e:
+    print(e)
+    
+  finally:
+    writer.close()
+    await writer.wait_closed
+
+
+async def start_async_server():
+  server=await asyncio.start_server(handler,'192.168.110.60',port=444)
+
+  async with server:
+    await server.serve_forever()
+
 
 if __name__=="__main__":
-  start_server()
+  asyncio.run(start_async_server())
 
 
 
