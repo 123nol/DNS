@@ -67,29 +67,16 @@ class DQuery:
   def decode_response(self):
     #this funtion gets the ip bytes from the response then decodes it, then concatnate the four components of the ip using a dot, then prints that ip string, it can also return it.
     data=self.response_packet
+    Qsec_data_len=len(self.request_packet)
     domain_ip=""
-    
-    pointer=data[12]
-    ini=12
-    #counter stores the size of each token of the domain in the quesiton section
-    counter=0
-    #we are doing this to find where in the response packet we should refernce, to get the resourceData(ip)
-    while pointer!=0:
-      counter+=pointer
-      ini+=counter
-      pointer=data[ini+1]
-      
-    
-    #the first +1 accounts for the 0 byte at the end of the qsec, then the two +2s account for the Qtype and Qclass 2 bytes each respectively
-    sizeOfQsec=counter+1+2+2
-    
-    #this is the count of bytes in the answer section before the actual resource data
-    # the additions account for bytes occupied by the pointer, the record type,the class, the TTL, and the resource Data length respectively
+     # the additions account for bytes occupied by the pointer, the record type,the class, the TTL, and the resource Data length respectively
     sizeOfAns= 2+2+2+4+2
+    pre_answer_data_len=Qsec_data_len+sizeOfAns
+    
 
-    #itterate over each byte in the 4 byte IPv4 address, each byte correspnds to the each of the four values in an ip address
+    # #itterate over each byte in the 4 byte IPv4 address, each byte correspnds to the each of the four values in an ip address
     for i in range(4):
-      domain_ip+=str(data[12+sizeOfQsec+sizeOfAns+i])+"."
+      domain_ip+=str(data[pre_answer_data_len+i])+"."
     #droping the "." at the end
     domain_ip=domain_ip[:-1]
     
@@ -103,7 +90,27 @@ def make_request():
   ip=query.decode_response()
   print(ip)
 
+'''
+inefficeint prototype code for decoding the 
+    # pointer=data[12]
+    # ini=12
+    # #counter stores the size of each token of the domain in the quesiton section
+    # counter=0
+    # #we are doing this to find where in the response packet we should refernce, to get the resourceData(ip)
+    # while pointer!=0:
+    #   counter+=pointer
+    #   ini+=counter
+    #   pointer=data[ini+1]
+      
+    
+    # #the first +1 accounts for the 0 byte at the end of the qsec, then the two +2s account for the Qtype and Qclass 2 bytes each respectively
+    # sizeOfQsec=counter+1+2+2
+    
+    # #this is the count of bytes in the answer section before the actual resource data
+   
 
+
+'''
 
 if __name__=="__main__":
   make_request()
